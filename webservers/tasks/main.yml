@@ -1,0 +1,43 @@
+- name: Install (Red Hat/CentOS) Apache Web Server
+  yum: pkg={{ redhat_apache }} state=latest
+  when: "ansible_os_family == 'RedHat'"
+  ignore_errors: yes
+  tags: demo
+  notify: Restart HTTPD (Red Hat/CentOS)
+- name: Install (Debian/Ubuntu) Apache Web Server
+  apt: pkg={{ debian_apache }} state=latest
+  when: "ansible_os_family == 'Debian'"
+  notify: Restart HTTPD (Debian / Ubuntu)
+  ignore_errors: yes
+  tags: demo
+- debug: msg="Need to install telnet"
+  when: "ansible_os_family == 'RedHat'"
+  notify: InstallTelnet
+  changed_when: true
+  tags: demo
+- name: StopHTTPD
+  service: name=httpd state=stopped
+  when: "ansible_os_family == 'RedHat'"
+  tags: cleanup
+- name: StopApache2
+  service: name=apache2 state=stopped
+  when: "ansible_os_family == 'Debian'"
+  tags: cleanup
+- name: Remove Test App (Telnet Lnyx) From Red Hat
+  yum: pkg={{ item }} state=absent
+  when: "ansible_os_family == 'RedHat'"
+  with_items:
+    - httpd
+    - telnet
+    - lynx
+  tags:
+    - cleanup
+- name: Remove Test App (Telnet / Lynx) From Debian
+  apt: pkg={{ item }} state=absent
+  when: "ansible_os_family == 'Debian'"
+  with_items:
+    - apache2
+    - telnet
+    - lynx
+  tags:
+    - cleanup

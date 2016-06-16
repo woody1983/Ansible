@@ -1,0 +1,16 @@
+- name: Restart HTTPD (Red Hat/CentOS)
+  service: name={{ redhat_apache }} state=restarted
+  when: "ansible_os_family == 'RedHat'"
+  ignore_errors: yes
+- name: Restart HTTPD (Debian / Ubuntu)
+  service: name={{ debian_apache }} state=restarted
+  when: "ansible_os_family == 'Debian'"
+  ignore_errors: yes
+- name: InstallTelnet
+  yum: pkg=telnet state=latest
+- name: StopHTTPD
+  service: name=httpd state=stopped
+  when: "ansible_os_family == 'RedHat'"
+- name: StopApache2
+  service: name=apache2 state=stopped
+  when: "ansible_os_family == 'Debian'"
